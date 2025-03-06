@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario Alimentare - Dieta AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <a href="/dashboard.html">Dieta AI</a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+          <li><a href="/calendar.html"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
+        </ul>
+      </nav>
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Esci</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <main>
+      <section class="section">
+        <h2 class="section-title">Calendario Alimentare Settimanale</h2>
+        <p>Ecco il tuo piano alimentare completo per i prossimi 7 giorni:</p>
+        
+        <div id="weeklyMealPlan"></div>
+      </section>
+      
+      <div class="actions">
+        <a href="/dashboard.html" class="button"><i class="fas fa-home"></i> Torna alla Dashboard</a>
+        <a href="/index.html" class="button button-secondary" id="newPlanBtn"><i class="fas fa-plus-circle"></i> Nuovo Piano Alimentare</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mealPlanString = localStorage.getItem('mealPlan');
+      if (mealPlanString) {
+        const mealPlan = JSON.parse(mealPlanString);
+        displayWeeklyMealPlan(mealPlan);
+      } else {
+        document.getElementById('weeklyMealPlan').innerHTML = `
+          <div class="no-data">
+            <p>Nessun piano alimentare disponibile. <a href="/index.html">Generane uno ora</a>.</p>
+          </div>
+        `;
+      }
+    });
+    
+    function displayWeeklyMealPlan(mealPlan) {
+      const weeklyContainer = document.getElementById('weeklyMealPlan');
+      if (!mealPlan || !mealPlan.days || mealPlan.days.length === 0) {
+        weeklyContainer.innerHTML = `<p>Nessun piano alimentare disponibile. <a href="/index.html">Genera ora</a>.</p>`;
+        return;
+      }
+      
+      let html = '';
+      
+      mealPlan.days.forEach((day, index) => {
+        html += `
+          <div class="meal-day">
+            <div class="meal-day-title">
+              <span><i class="fas fa-calendar-day"></i> ${day.day || `Giorno ${index + 1}`}</span>
+            </div>
+        `;
+        
+        // Colazione
+        html += `
+          <div class="meal-type">
+            <div class="meal-type-title"><i class="fas fa-coffee"></i> Colazione</div>
+            ${day.breakfast.map(item => `
+              <div class="meal-item">
+                <div class="meal-item-title">${item.name}</div>
+                <div class="meal-item-description">${item.description || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        // Pranzo
+        html += `
+          <div class="meal-type">
+            <div class="meal-type-title"><i class="fas fa-hamburger"></i> Pranzo</div>
+            ${day.lunch.map(item => `
+              <div class="meal-item">
+                <div class="meal-item-title">${item.name}</div>
+                <div class="meal-item-description">${item.description || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        // Cena
+        html += `
+          <div class="meal-type">
+            <div class="meal-type-title"><i class="fas fa-drumstick-bite"></i> Cena</div>
+            ${day.dinner.map(item => `
+              <div class="meal-item">
+                <div class="meal-item-title">${item.name}</div>
+                <div class="meal-item-description">${item.description || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        
+        // Spuntini
+        if (day.snacks && day.snacks.length > 0) {
+          html += `
+            <div class="meal-type">
+              <div class="meal-type-title"><i class="fas fa-apple-alt"></i> Spuntini</div>
+              ${day.snacks.map(item => `
+                <div class="meal-item">
+                  <div class="meal-item-title">${item.name}</div>
+                  <div class="meal-item-description">${item.description || ''}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+        
+        html += `</div>`;
+      });
+      
+      weeklyContainer.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

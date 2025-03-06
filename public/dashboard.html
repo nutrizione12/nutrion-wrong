@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Dieta AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <a href="/dashboard.html">Dieta AI</a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+          <li><a href="/calendar.html"><i class="fas fa-calendar-alt"></i> Calendario</a></li>
+        </ul>
+      </nav>
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Esci</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <main>
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <h3 class="card-title"><i class="fas fa-weight"></i> Monitoraggio Peso</h3>
+          <form id="weightForm" class="weight-form">
+            <input type="number" id="weightInput" class="form-control" placeholder="Peso in kg" step="0.1" required>
+            <button type="submit" class="button">Salva</button>
+          </form>
+          <div class="chart-container">
+            <canvas id="weightChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <h3 class="card-title"><i class="fas fa-chart-pie"></i> Nutrienti Giornalieri</h3>
+          <div class="chart-container">
+            <canvas id="nutrientsChart"></canvas>
+          </div>
+          <div class="nutritional-info">
+            <div class="nutrient">
+              <div class="nutrient-value" id="proteinValue">0g</div>
+              <div class="nutrient-label">Proteine</div>
+            </div>
+            <div class="nutrient">
+              <div class="nutrient-value" id="carbValue">0g</div>
+              <div class="nutrient-label">Carboidrati</div>
+            </div>
+            <div class="nutrient">
+              <div class="nutrient-value" id="fatValue">0g</div>
+              <div class="nutrient-label">Grassi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">Il Tuo Piano Alimentare di Oggi</h2>
+        <div id="todayMealPlan"></div>
+      </div>
+
+      <div class="actions">
+        <a href="/calendar.html" class="button"><i class="fas fa-calendar-alt"></i> Vedi Calendario Completo</a>
+        <a href="/index.html" class="button button-secondary" id="newPlanBtn"><i class="fas fa-plus-circle"></i> Nuovo Piano Alimentare</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mealPlanString = localStorage.getItem('mealPlan');
+      if (mealPlanString) {
+        const mealPlan = JSON.parse(mealPlanString);
+        
+        // Mostra il piano alimentare di oggi
+        displayTodayMealPlan(mealPlan);
+        
+        // Imposta i valori nutrizionali
+        updateNutritionValues(mealPlan);
+        
+        // Crea il grafico dei nutrienti
+        createNutrientsChart(mealPlan);
+      }
+      
+      // Carica i dati del peso
+      loadWeightHistory();
+    });
+    
+    function displayTodayMealPlan(mealPlan) {
+      const todayContainer = document.getElementById('todayMealPlan');
+      if (!mealPlan || !mealPlan.days || mealPlan.days.length === 0) {
+        todayContainer.innerHTML = `<p>Nessun piano alimentare disponibile. <a href="/index.html">Genera ora</a>.</p>`;
+        return;
+      }
+      
+      // Mostra il primo giorno come "oggi"
+      const today = mealPlan.days[0];
+      
+      let html = `
+        <div class="meal-day">
+          <div class="meal-day-title">
+            <span><i class="fas fa-utensils"></i> Oggi</span>
+            <span>${today.day}</span>
+          </div>
+      `;
+      
+      // Colazione
+      html += `
+        <div class="meal-type">
+          <div class="meal-type-title"><i class="fas fa-coffee"></i> Colazione</div>
+          ${today.breakfast.map(item => `
+            <div class="meal-item">
+              <div class="meal-item-title">${item.name}</div>
+              <div class="meal-item-description">${item.description || ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Pranzo
+      html += `
+        <div class="meal-type">
+          <div class="meal-type-title"><i class="fas fa-hamburger"></i> Pranzo</div>
+          ${today.lunch.map(item => `
+            <div class="meal-item">
+              <div class="meal-item-title">${item.name}</div>
+              <div class="meal-item-description">${item.description || ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Cena
+      html += `
+        <div class="meal-type">
+          <div class="meal-type-title"><i class="fas fa-drumstick-bite"></i> Cena</div>
+          ${today.dinner.map(item => `
+            <div class="meal-item">
+              <div class="meal-item-title">${item.name}</div>
+              <div class="meal-item-description">${item.description || ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      // Spuntini
+      if (today.snacks && today.snacks.length > 0) {
+        html += `
+          <div class="meal-type">
+            <div class="meal-type-title"><i class="fas fa-apple-alt"></i> Spuntini</div>
+            ${today.snacks.map(item => `
+              <div class="meal-item">
+                <div class="meal-item-title">${item.name}</div>
+                <div class="meal-item-description">${item.description || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      
+      html += `</div>`;
+      todayContainer.innerHTML = html;
+    }
+    
+    function updateNutritionValues(mealPlan) {
+      if (!mealPlan || !mealPlan.nutritional_info) return;
+      
+      const info = mealPlan.nutritional_info;
+      document.getElementById('proteinValue').textContent = `${info.protein || 0}g`;
+      document.getElementById('carbValue').textContent = `${info.carbs || 0}g`;
+      document.getElementById('fatValue').textContent = `${info.fat || 0}g`;
+    }
+    
+    function createNutrientsChart(mealPlan) {
+      if (!mealPlan || !mealPlan.nutritional_info) return;
+      
+      const info = mealPlan.nutritional_info;
+      const ctx = document.getElementById('nutrientsChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Proteine', 'Carboidrati', 'Grassi'],
+          datasets: [{
+            data: [info.protein || 0, info.carbs || 0, info.fat || 0],
+            backgroundColor: [
+              'rgba(67, 97, 238, 0.7)',
+              'rgba(114, 9, 183, 0.7)',
+              'rgba(247, 37, 133, 0.7)'
+            ],
+            borderColor: [
+              'rgba(67, 97, 238, 1)',
+              'rgba(114, 9, 183, 1)',
+              'rgba(247, 37, 133, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+    
+    async function loadWeightHistory() {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return;
+        
+        const response = await fetch('/api/weight-history', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Errore nel caricamento della cronologia del peso');
+        }
+        
+        const data = await response.json();
+        createWeightChart(data);
+      } catch (error) {
+        console.error('Errore:', error);
+      }
+    }
+    
+    function createWeightChart(data) {
+      if (!data || data.length === 0) {
+        return;
+      }
+      
+      const ctx = document.getElementById('weightChart').getContext('2d');
+      const labels = data.map(item => {
+        const date = new Date(item.created_at);
+        return `${date.getDate()}/${date.getMonth() + 1}`;
+      });
+      
+      const weights = data.map(item => item.weight);
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Peso (kg)',
+            data: weights,
+            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+            borderColor: 'rgba(76, 201, 240, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: 'rgba(76, 201, 240, 1)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                precision: 1
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+    
+    // Gestione form peso
+    document.getElementById('weightForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const weight = document.getElementById('weightInput').value;
+      if (!weight) return;
+      
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('Utente non autenticato');
+        
+        const response = await fetch('/api/log-weight', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ weight })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Errore durante il salvataggio del peso');
+        }
+        
+        alert('Peso registrato con successo!');
+        document.getElementById('weightInput').value = '';
+        
+        // Ricarica i dati del peso
+        loadWeightHistory();
+      } catch (error) {
+        console.error('Errore:', error);
+        alert('Errore durante il salvataggio del peso');
+      }
+    });
+  </script>
+</body>
+</html>

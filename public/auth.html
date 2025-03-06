@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accesso - Dieta AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+ <script type="module" src="/js/auth.js"></script></script>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --accent-color: #7209b7;
+      --success-color: #4cc9f0;
+      --text-color: #333;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --input-bg: #f1f3f5;
+      --border-color: #e9ecef;
+      --shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      background-image: radial-gradient(#e0e8ff 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .auth-container {
+      width: 100%;
+      max-width: 420px;
+      margin: 20px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      transition: all 0.3s ease;
+      background: var(--card-bg);
+      position: relative;
+    }
+    
+    .auth-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 40px 30px;
+      text-align: center;
+    }
+    
+    .auth-header h1 {
+      color: white;
+      font-size: 28px;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .auth-header p {
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    
+    .form-container {
+      padding: 40px 30px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 25px;
+      color: var(--text-color);
+      position: relative;
+    }
+    
+    .form-title:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      width: 40px;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 5px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+    }
+    
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: none;
+      border-radius: 12px;
+      background: var(--input-bg);
+      font-size: 15px;
+      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    input::placeholder {
+      color: #adb5bd;
+    }
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+    }
+    
+    .auth-links {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 14px;
+    }
+    
+    .auth-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .auth-links a:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+    
+    .brand-icon {
+      font-size: 45px;
+      margin-bottom: 15px;
+      color: white;
+    }
+    
+    @media (max-width: 480px) {
+      .auth-container {
+        margin: 15px;
+      }
+      
+      .auth-header {
+        padding: 30px 20px;
+      }
+      
+      .form-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <i class="fas fa-leaf brand-icon"></i>
+      <h1>Dieta AI</h1>
+      <p>Nutrizione intelligente per il tuo benessere</p>
+    </div>
+    
+    <!-- Login Form -->
+    <div id="loginContainer" class="form-container">
+      <h2 class="form-title">Accedi</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="loginEmail" placeholder="La tua email" required>
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="loginPassword" placeholder="Password" required>
+        </div>
+        <button type="submit">Accedi <i class="fas fa-arrow-right"></i></button>
+      </form>
+      <div class="auth-links">
+        <a href="#" onclick="showRegister()">Non hai un account? Registrati</a>
+      </div>
+    </div>
+    
+    <!-- Register Form -->
+    <div id="registerContainer" class="form-container" style="display: none;">
+      <h2 class="form-title">Registrati</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="registerEmail" placeholder="La tua email" required>
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="registerPassword" placeholder="Password" required>
+        </div>
+        <button type="submit">Crea Account <i class="fas fa-user-plus"></i></button>
+      </form>
+      <div class="auth-links">
+        <a href="#" onclick="showLogin()">Hai già un account? Accedi</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <!-- Aggiungi questo script prima della chiusura </body> -->
+  <script>
+    // Previene ricaricamento involontario
+    if (window.performance && performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('userId');
+    }
+  </script>
+</body>
+</html>
